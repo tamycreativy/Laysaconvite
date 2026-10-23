@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laysa · O Circo da Alegria</title>
+<meta property="og:title" content="Laysa · O Circo da Alegria">
+<meta property="og:description" content="O circo da alegria vai começar! Toque para abrir o convite.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://creativyconvites.com.br/Laysaconvite/capa-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Rye&display=swap" rel="stylesheet">
+<style>
+/* Layout: palco 9:16 que cabe em qualquer tela. Cortina abre (vídeo) -> informações. Botões = áreas transparentes sobre a arte, em % do palco. */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rosa:#d9776f;--vinho:#7a2f2c;--creme:#f9ead0;--ouro:#b8923f}
+html,body{width:100%;height:100%;overflow:hidden;background:#3a1b1a;font-family:'Quicksand',system-ui,sans-serif;color:var(--vinho)}
+body{position:fixed;inset:0;-webkit-tap-highlight-color:transparent}
+.bg{position:absolute;inset:-6%;background:center/cover no-repeat;filter:blur(24px) brightness(.85);transform:scale(1.1)}
+.stage{position:absolute;top:50%;left:50%;height:100dvh;width:calc(100dvh*9/16);max-width:100vw;max-height:calc(100vw*16/9);transform:translate(-50%,-50%);overflow:hidden;background:#000;box-shadow:0 0 70px #000a}
+.tela{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility 0s .8s}
+.tela.on{opacity:1;visibility:visible;transition:opacity .8s ease}
+.arte,.tela video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;user-select:none;-webkit-user-drag:none}
+
+/* início */
+#inicio{cursor:pointer;z-index:4}
+#inicio .dica{position:absolute;left:0;right:0;bottom:11%;text-align:center;font:700 clamp(15px,4.4vw,19px)/1.3 'Quicksand',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#fff;text-shadow:0 2px 12px #5a1f1c,0 0 22px #5a1f1c;animation:pisca 2s ease-in-out infinite}
+#inicio .dica b{display:block;font:400 clamp(40px,12vw,58px)/1.05 'Rye',serif;letter-spacing:.02em;text-transform:none;color:#ffe9b0;margin-bottom:6px}
+@keyframes pisca{0%,100%{opacity:.6;transform:translateY(0)}50%{opacity:1;transform:translateY(-6px)}}
+
+/* botões sobre a arte */
+.hit{position:absolute;width:16.6%;aspect-ratio:1;border-radius:50%;cursor:pointer;border:0;background:transparent;outline:none;-webkit-appearance:none;appearance:none;transition:transform .15s,background .25s}
+.hit::before{content:"";position:absolute;inset:0;border-radius:50%;animation:halo 3s ease-in-out infinite}
+.hit:nth-of-type(2)::before{animation-delay:.4s}.hit:nth-of-type(3)::before{animation-delay:.8s}.hit:nth-of-type(4)::before{animation-delay:1.2s}
+@keyframes halo{0%,100%{box-shadow:0 0 0 0 rgba(255,214,150,0)}50%{box-shadow:0 0 16px 5px rgba(255,214,150,.85)}}
+.hit:hover{background:rgba(255,230,190,.2)}
+.hit:active{transform:scale(.93);background:rgba(255,230,190,.35)}
+.hit:focus-visible{box-shadow:0 0 0 3px #fff}
+#b1{left:32.7%;top:66%}#b2{left:50.3%;top:66%}
+#b3{left:32.7%;top:76.55%}#b4{left:50.3%;top:76.55%}
+
+/* telas de conteúdo */
+.sub{z-index:5}
+#presentes .arte.fundo{object-fit:cover}
+#presentes .ticket{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:drop-shadow(0 10px 22px rgba(60,20,20,.55));animation:sobe .7s ease both}
+@keyframes sobe{from{transform:translateY(16px) scale(.97)}to{transform:none}}
+.voltar{position:absolute;right:5%;top:2.6%;width:11%;aspect-ratio:1;border-radius:50%;border:2px solid var(--ouro);background:rgba(249,234,208,.92);color:var(--vinho);font:700 clamp(18px,5.5vw,28px)/1 system-ui;display:grid;place-items:center;cursor:pointer;z-index:6;box-shadow:0 4px 12px #0005}
+
+/* som */
+#som{position:absolute;left:3.5%;top:2.2%;width:9.5%;aspect-ratio:1;border-radius:50%;border:2px solid var(--ouro);background:rgba(249,234,208,.92);color:var(--vinho);display:none;place-items:center;cursor:pointer;z-index:9;box-shadow:0 4px 12px #0005}
+#som.on{display:grid}
+#som svg{width:55%;height:55%}
+#som .x{display:none}#som.mudo .x{display:block}#som.mudo .w{display:none}
+
+/* confirmação de presença */
+#rsvp{z-index:7;background:rgba(70,22,20,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:6% 5%}
+.cartao{position:relative;width:100%;max-height:92%;overflow:auto;padding:7% 7% 6%;border-radius:20px;background:linear-gradient(170deg,#fbefd6,#f4dcc0);border:3px solid var(--ouro);box-shadow:0 0 0 6px rgba(184,146,63,.25),0 24px 60px #0008;text-align:center}
+.cartao::before{content:"★";display:block;color:var(--ouro);font-size:22px;line-height:1;margin-bottom:4px}
+.cartao h2{font:400 clamp(28px,8.4vw,40px)/1.05 'Rye',serif;color:var(--rosa);margin-bottom:4px}
+.cartao .lead{font:600 clamp(14px,4vw,17px)/1.35 'Quicksand',sans-serif;color:var(--vinho);opacity:.9;margin-bottom:12px}
+.cartao label{display:block;text-align:left;font:700 clamp(11px,3.1vw,13px)/1 'Quicksand',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ouro);margin:14px 0 6px}
+.cartao input[type=text],.cartao textarea{width:100%;padding:12px 14px;border-radius:12px;border:2px solid rgba(184,146,63,.55);background:rgba(255,255,255,.6);color:var(--vinho);font:600 17px 'Quicksand',sans-serif;outline:none}
+.cartao textarea{resize:none;height:72px}
+.cartao input:focus,.cartao textarea:focus{border-color:var(--rosa);box-shadow:0 0 0 3px rgba(217,119,111,.25)}
+.cartao ::placeholder{color:rgba(122,47,44,.45)}
+.opc{display:flex;gap:10px}
+.opc button{flex:1;padding:12px 8px;border-radius:12px;border:2px solid rgba(184,146,63,.6);background:transparent;color:var(--vinho);font:700 clamp(14px,4vw,17px) 'Quicksand',sans-serif;cursor:pointer;transition:.2s}
+.opc button.sel{background:linear-gradient(180deg,#e58a82,#cf6a62);color:#fff;border-color:#b8564f;box-shadow:0 6px 14px -6px #8a3a35}
+.qtd{display:flex;align-items:center;justify-content:center;gap:18px}
+.qtd button{width:44px;height:44px;border-radius:50%;border:2px solid var(--ouro);background:#fff7e6;color:var(--vinho);font:700 24px/1 system-ui;cursor:pointer}
+.qtd b{min-width:44px;font:400 30px 'Rye',serif;color:var(--vinho)}
+.enviar{margin-top:20px;width:100%;padding:14px;border-radius:999px;border:2px solid #b8564f;cursor:pointer;background:linear-gradient(180deg,#e58a82,#cf6a62);color:#fff;font:700 16px 'Quicksand',sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 10px 22px -8px #8a3a35}
+.enviar:disabled{opacity:.6;cursor:default}
+.erro{margin-top:10px;font-size:15px;font-weight:600;color:#b02a2a;min-height:1em}
+.ok{display:none;padding:6% 0}
+.ok .big{font:400 clamp(32px,9.5vw,46px)/1.05 'Rye',serif;color:var(--rosa)}
+.ok p{font:600 clamp(16px,4.6vw,20px)/1.4 'Quicksand',sans-serif;margin-top:12px}
+.cartao.feito form{display:none}.cartao.feito .ok{display:block}.cartao.feito h2,.cartao.feito .lead{display:none}
+#rsvp .voltar{right:4%;top:3%}
+
+#aviso{position:absolute;left:8%;right:8%;bottom:5%;z-index:12;padding:12px 16px;border-radius:16px;background:var(--creme);border:2px solid var(--ouro);color:var(--vinho);font:700 15px/1.35 'Quicksand',sans-serif;text-align:center;box-shadow:0 10px 24px #0008;opacity:0;pointer-events:none;transform:translateY(10px);transition:.3s}
+#aviso.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.hit::before,#inicio .dica,#presentes .ticket{animation:none}.tela,.tela.on{transition:none}}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+
+<div class="stage" id="stage">
+
+  <!-- Cortina que abre (vídeo). A música é um áudio à parte, para continuar tocando nas informações -->
+  <section class="tela on" id="inicio" aria-label="Toque para abrir o convite">
+    <video id="video" src="abertura.mp4" poster="poster.jpg" muted playsinline webkit-playsinline preload="auto"></video>
+    <div class="dica"><b>Laysa</b>toque para abrir a cortina</div>
+  </section>
+
+  <!-- Informações -->
+  <section class="tela" id="info" aria-label="Informações do convite">
+    <img class="arte" src="info.jpg" alt="Convite da Laysa: dia 28 de novembro, às 16 horas">
+    <button class="hit" id="b1" type="button" aria-label="Confirmar presença"></button>
+    <button class="hit" id="b2" type="button" aria-label="Localização"></button>
+    <button class="hit" id="b3" type="button" aria-label="Para presentear"></button>
+    <button class="hit" id="b4" type="button" aria-label="Sugestões de roupas e presentes"></button>
+  </section>
+
+  <section class="tela sub" id="presentes" aria-label="Para presentear">
+    <img class="arte fundo" src="cortina.jpg" alt="">
+    <img class="ticket" src="presentes.webp" alt="Para presentear: brinquedos educativos, blusas tamanho 7 anos e sapatos número 29">
+    <button class="voltar" type="button" data-fechar aria-label="Voltar ao convite">✕</button>
+  </section>
+
+  <!-- Confirmar presença dentro do próprio convite -->
+  <section class="tela sub" id="rsvp" aria-label="Confirmar presença">
+    <button class="voltar" type="button" data-fechar aria-label="Fechar">✕</button>
+    <div class="cartao" id="cartao">
+      <h2>Confirmar presença</h2>
+      <p class="lead">Conte para a Laysa se você vem ao circo!</p>
+      <form id="form" autocomplete="off" novalidate>
+        <label for="nome">Seu nome</label>
+        <input type="text" id="nome" maxlength="80" placeholder="Nome e sobrenome">
+        <label>Você vai?</label>
+        <div class="opc"><button type="button" id="vou" class="sel">Vou sim</button><button type="button" id="nvou">Não poderei</button></div>
+        <div id="qbox">
+          <label>Quantas pessoas, contando com você?</label>
+          <div class="qtd"><button type="button" id="menos" aria-label="Menos">−</button><div><b id="qn">1</b></div><button type="button" id="mais" aria-label="Mais">+</button></div>
+        </div>
+        <label for="obs">Recado (opcional)</label>
+        <textarea id="obs" maxlength="300" placeholder="Um recado para a Laysa"></textarea>
+        <button class="enviar" id="enviar" type="submit">Enviar</button>
+        <div class="erro" id="erro" role="alert"></div>
+      </form>
+      <div class="ok" id="ok"><div class="big" id="okt">Presença confirmada</div><p id="okp">Obrigada! Te esperamos no circo.</p></div>
+    </div>
+  </section>
+
+  <button id="som" type="button" aria-label="Ligar ou desligar a música">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M17 9l5 6M22 9l-5 6"/></svg>
+  </button>
+  <div id="aviso" role="status"></div>
+  <audio id="musica" src="musica.m4a" loop preload="auto"></audio>
+</div>
+
+<script>
+/* ====== CONFIGURAÇÕES: troque aqui ====== */
+var CONFIG = {
+  /* Local da festa. Se tiver o link exato do Google Maps (Compartilhar > copiar link), cole aqui no lugar. */
+  mapa: 'https://www.google.com/maps/search/?api=1&query=Buffet+Magia+Dourada+Fortaleza',
+  /* Onde as confirmações ficam guardadas (Supabase). Tabela: confirmacoes_laysa */
+  sbUrl: 'https://bfncxrmxlkdxqqrjmizq.supabase.co',
+  sbKey: 'sb_publishable_1Tl_N6-UxutKxK9gOrcQVA_J4FrT7MJ',
+  tabela: 'confirmacoes_laysa'
+};
+/* ======================================== */
+
+var $=function(i){return document.getElementById(i)};
+var DEMO=/[?&]demo\b/.test(location.search);
+var inicio=$('inicio'),info=$('info'),video=$('video'),musica=$('musica'),som=$('som'),aviso=$('aviso');
+$('bg').style.backgroundImage='url(cortina.jpg)';
+
+function msg(t){aviso.textContent=t;aviso.classList.add('on');clearTimeout(msg.t);msg.t=setTimeout(function(){aviso.classList.remove('on')},3400)}
+
+/* ---- abrir: toca a cortina (vídeo) e a música ---- */
+var iniciou=false;
+function mostrarInfo(){
+  if(info.classList.contains('on'))return;
+  info.classList.add('on');inicio.classList.remove('on');
+  setTimeout(function(){try{video.pause()}catch(e){}},900);
+}
+function abrir(){
+  if(iniciou)return;iniciou=true;
+  inicio.querySelector('.dica').style.display='none';
+  som.classList.add('on');
+  try{musica.currentTime=0;musica.volume=1;var p=musica.play();if(p&&p.catch)p.catch(function(){})}catch(e){}
+  var p2=video.play();
+  if(p2&&p2.catch)p2.catch(function(){mostrarInfo()});
+  if(navigator.vibrate)try{navigator.vibrate(20)}catch(e){}
+}
+inicio.addEventListener('click',abrir);
+video.addEventListener('ended',mostrarInfo);
+video.addEventListener('playing',function(){try{musica.currentTime=video.currentTime}catch(e){}});
+
+/* ---- som ligado/desligado ---- */
+som.addEventListener('click',function(){
+  if(musica.paused){musica.play();som.classList.remove('mudo')}
+  else if(musica.muted){musica.muted=false;som.classList.remove('mudo')}
+  else{musica.muted=true;som.classList.add('mudo')}
+});
+document.addEventListener('visibilitychange',function(){if(document.hidden){musica.pause()}else if(iniciou&&!som.classList.contains('mudo')){musica.play().catch(function(){})}});
+
+/* ---- telas de conteúdo ---- */
+function abrirTela(id){$(id).classList.add('on')}
+function fecharTelas(){['presentes','rsvp'].forEach(function(i){$(i).classList.remove('on')})}
+document.querySelectorAll('[data-fechar]').forEach(function(b){b.addEventListener('click',fecharTelas)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharTelas()});
+
+$('b1').addEventListener('click',function(){abrirTela('rsvp')});
+$('b3').addEventListener('click',function(){abrirTela('presentes')});
+$('b4').addEventListener('click',function(){abrirTela('presentes')});
+$('b2').addEventListener('click',function(){
+  if(CONFIG.mapa)window.open(CONFIG.mapa,'_blank','noopener');
+  else msg('A localização será informada em breve.');
+});
+
+/* ---- confirmação de presença ---- */
+var vai=true,qtd=1;
+function setVai(v){vai=v;$('vou').classList.toggle('sel',v);$('nvou').classList.toggle('sel',!v);$('qbox').style.display=v?'block':'none'}
+$('vou').addEventListener('click',function(){setVai(true)});
+$('nvou').addEventListener('click',function(){setVai(false)});
+$('menos').addEventListener('click',function(){qtd=Math.max(1,qtd-1);$('qn').textContent=qtd});
+$('mais').addEventListener('click',function(){qtd=Math.min(10,qtd+1);$('qn').textContent=qtd});
+
+$('form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var nome=$('nome').value.trim(),erro=$('erro'),btn=$('enviar');
+  erro.textContent='';
+  if(nome.length<2){erro.textContent='Escreva o seu nome, por favor.';$('nome').focus();return}
+  btn.disabled=true;btn.textContent='Enviando...';
+  var dados={nome:nome,vai:vai,pessoas:vai?qtd:0,obs:$('obs').value.trim()||null};
+  function sucesso(){
+    var pn=nome.split(' ')[0];
+    $('okt').textContent=vai?'Presença confirmada':'Recado enviado';
+    $('okp').textContent=vai?'Obrigada, '+pn+'! Te esperamos no circo.':'Obrigada por avisar, '+pn+'. Vamos sentir a sua falta.';
+    $('cartao').classList.add('feito');
+  }
+  if(DEMO){setTimeout(sucesso,500);return}  /* demonstração do portfólio: não grava nada */
+  fetch(CONFIG.sbUrl+'/rest/v1/'+CONFIG.tabela,{method:'POST',headers:{apikey:CONFIG.sbKey,Authorization:'Bearer '+CONFIG.sbKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(dados)})
+   .then(function(r){if(!r.ok)throw new Error(r.status);sucesso()})
+   .catch(function(){btn.disabled=false;btn.textContent='Enviar';erro.textContent='Não consegui enviar agora. Confira a internet e tente de novo.'});
+});
+</script>
+</body>
+</html>
